@@ -436,6 +436,19 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
       }
 
       // Always use Supabase for data storage
+      // 1. Cleanup R2 storage first (best effort)
+      try {
+        await fetch('/api/r2/delete-patient', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ patientId: id }),
+        });
+      } catch (cleanupErr) {
+        console.error('Failed to cleanup R2 storage for patient:', cleanupErr);
+        // Continue with DB deletion even if R2 cleanup fails
+      }
+
+      // 2. Delete patient from DB (visits will be deleted via cascade if set, but we might need to manually handle visits if not)
       const { error } = await supabase
         .from('patients')
         .delete()
