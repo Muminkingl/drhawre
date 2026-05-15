@@ -21,14 +21,12 @@ export default function PatientEditForm({ patient, onSubmit, onCancel, isLoading
     diagnosis: patient.diagnosis,
     treatment: patient.treatment,
     currentTreatment: patient.currentTreatment || '',
-    response: patient.response,
+    history: patient.history || '',
+    pastMedicalHistory: patient.pastMedicalHistory || '',
+    drugHistory: patient.drugHistory || '',
+    pastSurgicalHistory: patient.pastSurgicalHistory || '',
     note: patient.note || '',
     tableData: patient.tableData || '',
-    imageUrl: patient.imageUrl || '',
-    imaging: patient.imaging || '',
-    ultrasound: patient.ultrasound || '',
-    labText: patient.labText || '',
-    report: patient.report || '',
     followUpDate: patient.followUpDate || '',
 
     // clinicId is read-only, not included in editable form
@@ -108,14 +106,12 @@ export default function PatientEditForm({ patient, onSubmit, onCancel, isLoading
       diagnosis: patient.diagnosis,
       treatment: patient.treatment,
       currentTreatment: patient.currentTreatment || '',
-      response: patient.response,
+      history: patient.history || '',
+      pastMedicalHistory: patient.pastMedicalHistory || '',
+      drugHistory: patient.drugHistory || '',
+      pastSurgicalHistory: patient.pastSurgicalHistory || '',
       note: patient.note || '',
       tableData: patient.tableData || '',
-      imageUrl: patient.imageUrl || '',
-      imaging: patient.imaging || '',
-      ultrasound: patient.ultrasound || '',
-      labText: patient.labText || '',
-      report: patient.report || '',
       followUpDate: patient.followUpDate || '',
 
       // clinicId is read-only, not included in editable form
@@ -451,11 +447,6 @@ export default function PatientEditForm({ patient, onSubmit, onCancel, isLoading
     printWindow.document.close();
   };
 
-  const handlePrintReport = (e: React.MouseEvent) => {
-    e.preventDefault(); // Prevent form submission
-    const content = formData.report || 'No report information specified.';
-    handlePrintGeneric(content, 'Report Card');
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -650,102 +641,67 @@ export default function PatientEditForm({ patient, onSubmit, onCancel, isLoading
           </div>
         </div>
 
-        {/* Image URL */}
+        {/* History */}
         <div>
-          <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Patient Image URL <span className="text-xs text-gray-500">(Optional)</span>
-          </label>
-          <input
-            type="text"
-            id="imageUrl"
-            name="imageUrl"
-            value={formData.imageUrl}
-            onChange={handleChange}
-            disabled={isLoading}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white disabled:opacity-70 disabled:cursor-not-allowed"
-            placeholder="URL to patient image"
-          />
-        </div>
-
-        {/* Imaging */}
-        <div>
-          <label htmlFor="imaging" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Imaging <span className="text-xs text-gray-500">(Optional)</span>
+          <label htmlFor="history" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            History
           </label>
           <textarea
-            id="imaging"
-            name="imaging"
-            value={formData.imaging}
+            id="history"
+            name="history"
+            value={formData.history}
             onChange={handleChange}
             rows={3}
             disabled={isLoading}
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white disabled:opacity-70 disabled:cursor-not-allowed"
-            placeholder="Imaging information"
           />
         </div>
 
-        {/* Ultrasound */}
+        {/* Past Medical History */}
         <div>
-          <label htmlFor="ultrasound" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Ultrasound <span className="text-xs text-gray-500">(Optional)</span>
+          <label htmlFor="pastMedicalHistory" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Past Medical History
           </label>
           <textarea
-            id="ultrasound"
-            name="ultrasound"
-            value={formData.ultrasound}
+            id="pastMedicalHistory"
+            name="pastMedicalHistory"
+            value={formData.pastMedicalHistory}
             onChange={handleChange}
             rows={3}
             disabled={isLoading}
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white disabled:opacity-70 disabled:cursor-not-allowed"
-            placeholder="Ultrasound information"
           />
         </div>
 
-        {/* Report */}
+        {/* Drug History */}
         <div>
-          <div className="flex justify-between items-center mb-1">
-            <label htmlFor="report" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Report <span className="text-xs text-gray-500">(Optional)</span>
-            </label>
-            <button
-              type="button"
-              onClick={handlePrintReport}
-              className="px-2 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-xs flex items-center"
-              title="Print report"
-            >
-              <svg className="h-3 w-3 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-              </svg>
-              Print
-            </button>
-          </div>
-          <textarea
-            id="report"
-            name="report"
-            value={formData.report}
-            onChange={handleChange}
-            rows={3}
-            disabled={isLoading}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white disabled:opacity-70 disabled:cursor-not-allowed"
-            placeholder="Report information"
-          />
-        </div>
-
-
-        {/* Lab Test */}
-        <div>
-          <label htmlFor="labText" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Lab Test <span className="text-xs text-gray-500">(Optional)</span>
+          <label htmlFor="drugHistory" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Drug History
           </label>
           <textarea
-            id="labText"
-            name="labText"
-            value={formData.labText}
+            id="drugHistory"
+            name="drugHistory"
+            value={formData.drugHistory}
             onChange={handleChange}
             rows={3}
             disabled={isLoading}
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white disabled:opacity-70 disabled:cursor-not-allowed"
-            placeholder="Lab test information"
+          />
+        </div>
+
+        {/* Past Surgical History */}
+        <div>
+          <label htmlFor="pastSurgicalHistory" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Past Surgical History
+          </label>
+          <textarea
+            id="pastSurgicalHistory"
+            name="pastSurgicalHistory"
+            value={formData.pastSurgicalHistory}
+            onChange={handleChange}
+            rows={3}
+            disabled={isLoading}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white disabled:opacity-70 disabled:cursor-not-allowed"
           />
         </div>
 
@@ -765,22 +721,7 @@ export default function PatientEditForm({ patient, onSubmit, onCancel, isLoading
             placeholder="Follow up date"
           />
         </div>
-      </div>
 
-      {/* Response */}
-      <div>
-        <label htmlFor="response" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          Response
-        </label>
-        <input
-          type="text"
-          id="response"
-          name="response"
-          value={formData.response}
-          onChange={handleChange}
-          disabled={isLoading}
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white disabled:opacity-70 disabled:cursor-not-allowed"
-        />
       </div>
 
       {/* Notes */}

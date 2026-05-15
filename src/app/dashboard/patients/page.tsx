@@ -353,23 +353,7 @@ export default function PatientsPage() {
     handlePrintGeneric(patient, content, 'Treatment Card');
   };
 
-  // Print Lab Test function
-  const handlePrintLabText = (patient: Patient) => {
-    const content = patient.labText || 'No lab test specified.';
-    handlePrintGeneric(patient, content, 'Lab Test Card');
-  };
 
-  // Print Ultrasound function
-  const handlePrintUltrasound = (patient: Patient) => {
-    const content = patient.ultrasound || 'No ultrasound information specified.';
-    handlePrintGeneric(patient, content, 'Ultrasound Card');
-  };
-
-  // Print Imaging function
-  const handlePrintImaging = (patient: Patient) => {
-    const content = patient.imaging || 'No imaging information specified.';
-    handlePrintGeneric(patient, content, 'Imaging Card');
-  };
 
   // Handle report generation
   const handleGenerateReport = async (patient: Patient) => {
@@ -442,7 +426,7 @@ export default function PatientsPage() {
           (patient.dob && patient.dob.includes(searchLower)) ||
           (patient.treatment && patient.treatment.toLowerCase().includes(searchLower)) ||
           (patient.sex && patient.sex.toLowerCase().includes(searchLower)) ||
-          (patient.response && patient.response.toLowerCase().includes(searchLower)) ||
+          (patient.history && patient.history.toLowerCase().includes(searchLower)) ||
           (patient.mobileNumber && patient.mobileNumber.toLowerCase().includes(searchLower)) ||
           (patient.clinicId && patient.clinicId.toLowerCase().includes(searchLower))
         );
@@ -466,8 +450,8 @@ export default function PatientsPage() {
               patient.sex && patient.sex.trim().toLowerCase() === searchLower.trim().toLowerCase()
             );
             break;
-          case 'response':
-            matchesSearch = Boolean(patient.response && patient.response.toLowerCase().includes(searchLower));
+          case 'history':
+            matchesSearch = Boolean(patient.history && patient.history.toLowerCase().includes(searchLower));
             break;
           case 'mobile':
             matchesSearch = Boolean(patient.mobileNumber && patient.mobileNumber.toLowerCase().includes(searchLower));
@@ -686,8 +670,8 @@ export default function PatientsPage() {
                             ? "Search by treatment..."
                             : activeFilter === 'gender'
                               ? "Search by gender..."
-                              : activeFilter === 'response'
-                                ? "Search by response..."
+                              : activeFilter === 'history'
+                                ? "Search by history..."
                                 : activeFilter === 'mobile'
                                   ? "Search by mobile number..."
                                   : activeFilter === 'hospitalFile'
@@ -741,7 +725,7 @@ export default function PatientsPage() {
                       <option value="diagnosis">Diagnosis</option>
                       <option value="treatment">Treatment</option>
                       <option value="gender">Gender</option>
-                      <option value="response">Response</option>
+                      <option value="history">History</option>
                       <option value="mobile">Mobile Number</option>
                       <option value="hospitalFile">Hospital File Number</option>
                       <option value="clinicId">Clinic ID</option>
@@ -1038,69 +1022,35 @@ export default function PatientsPage() {
                           <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Clinic ID</span>
                           <span className="text-sm text-gray-900 dark:text-gray-100">{selectedPatient.clinicId}</span>
                         </div>
-                        {selectedPatient.response && (
-                          <div className="flex justify-between">
-                            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Response</span>
-                            <span className="text-sm text-gray-900 dark:text-gray-100">{selectedPatient.response}</span>
-                          </div>
-                        )}
-                        {selectedPatient.imaging && (
+                        {selectedPatient.history && (
                           <div className="flex flex-col">
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Imaging</span>
-                              <button
-                                onClick={() => handlePrintImaging(selectedPatient)}
-                                title="Print imaging card for this patient"
-                                className="flex items-center px-2 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-xs"
-                              >
-                                <svg className="h-3 w-3 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                                </svg>
-                                Print
-                              </button>
-                            </div>
+                            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">History</span>
                             <div className="mt-1 bg-white dark:bg-gray-800 p-2 rounded border border-gray-200 dark:border-gray-600 max-h-40 overflow-y-auto">
-                              <span className="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap break-words">{selectedPatient.imaging}</span>
+                              <span className="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap break-words">{selectedPatient.history}</span>
                             </div>
                           </div>
                         )}
-                        {selectedPatient.ultrasound && (
+                        {selectedPatient.pastMedicalHistory && (
                           <div className="flex flex-col">
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Ultrasound</span>
-                              <button
-                                onClick={() => handlePrintUltrasound(selectedPatient)}
-                                title="Print ultrasound card for this patient"
-                                className="flex items-center px-2 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-xs"
-                              >
-                                <svg className="h-3 w-3 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                                </svg>
-                                Print
-                              </button>
-                            </div>
+                            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Past Medical History</span>
                             <div className="mt-1 bg-white dark:bg-gray-800 p-2 rounded border border-gray-200 dark:border-gray-600 max-h-40 overflow-y-auto">
-                              <span className="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap break-words">{selectedPatient.ultrasound}</span>
+                              <span className="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap break-words">{selectedPatient.pastMedicalHistory}</span>
                             </div>
                           </div>
                         )}
-                        {selectedPatient.labText && (
+                        {selectedPatient.drugHistory && (
                           <div className="flex flex-col">
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Lab Test</span>
-                              <button
-                                onClick={() => handlePrintLabText(selectedPatient)}
-                                title="Print lab text card for this patient"
-                                className="flex items-center px-2 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-xs"
-                              >
-                                <svg className="h-3 w-3 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                                </svg>
-                                Print
-                              </button>
-                            </div>
+                            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Drug History</span>
                             <div className="mt-1 bg-white dark:bg-gray-800 p-2 rounded border border-gray-200 dark:border-gray-600 max-h-40 overflow-y-auto">
-                              <span className="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap break-words">{selectedPatient.labText}</span>
+                              <span className="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap break-words">{selectedPatient.drugHistory}</span>
+                            </div>
+                          </div>
+                        )}
+                        {selectedPatient.pastSurgicalHistory && (
+                          <div className="flex flex-col">
+                            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Past Surgical History</span>
+                            <div className="mt-1 bg-white dark:bg-gray-800 p-2 rounded border border-gray-200 dark:border-gray-600 max-h-40 overflow-y-auto">
+                              <span className="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap break-words">{selectedPatient.pastSurgicalHistory}</span>
                             </div>
                           </div>
                         )}
@@ -1108,27 +1058,6 @@ export default function PatientsPage() {
                           <div className="flex justify-between">
                             <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Follow Up Date</span>
                             <span className="text-sm text-gray-900 dark:text-gray-100">{selectedPatient.followUpDate}</span>
-                          </div>
-                        )}
-                        {selectedPatient.report && (
-                          <div className="flex flex-col">
-                            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Report</span>
-                            <div className="mt-1 bg-white dark:bg-gray-800 p-2 rounded border border-gray-200 dark:border-gray-600 max-h-40 overflow-y-auto">
-                              <span className="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap break-words">{selectedPatient.report}</span>
-                            </div>
-                          </div>
-                        )}
-                        {selectedPatient.imageUrl && (
-                          <div className="flex flex-col mt-2">
-                            <span className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Patient Image URL</span>
-                            <a
-                              href={selectedPatient.imageUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-sm text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 break-all"
-                            >
-                              {selectedPatient.imageUrl}
-                            </a>
                           </div>
                         )}
                       </div>

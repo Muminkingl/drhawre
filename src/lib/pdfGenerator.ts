@@ -28,11 +28,7 @@ const shortenUrl = async (url: string): Promise<string> => {
 
 // Function to generate a PDF report for a patient
 export const generatePatientPDF = async (patient: Patient) => {
-  // Shorten the image URL if it exists
-  let shortenedImageUrl = 'N/A';
-  if (patient.imageUrl) {
-    shortenedImageUrl = await shortenUrl(patient.imageUrl);
-  }
+  // No longer shortening image URL as it's removed
   // Create new PDF document
   const doc = new jsPDF();
 
@@ -132,8 +128,7 @@ export const generatePatientPDF = async (patient: Patient) => {
       ['DOB', patient.dob || 'N/A'],
       ['Sex', patient.sex || 'N/A'],
       ['Mobile Number', patient.mobileNumber || 'N/A'],
-      ['Hospital File Number', patient.hospitalFileNumber || 'N/A'],
-      ['Image URL', shortenedImageUrl]
+      ['Hospital File Number', patient.hospitalFileNumber || 'N/A']
     ],
     theme: 'striped',
     headStyles: {
@@ -161,11 +156,10 @@ export const generatePatientPDF = async (patient: Patient) => {
       ['Diagnosis', patient.diagnosis || 'N/A'],
       ['Age of Diagnosis', patient.ageOfDiagnosis || 'N/A'],
       ['Treatment', patient.treatment || 'N/A'],
-      ['Response', patient.response || 'N/A'],
-      ['Imaging', patient.imaging || 'N/A'],
-      ['Ultrasound', patient.ultrasound || 'N/A'],
-      ['Lab Test', patient.labText || 'N/A'],
-      ['Report', patient.report || 'N/A'],
+      ['History', patient.history || 'N/A'],
+      ['Past Medical History', patient.pastMedicalHistory || 'N/A'],
+      ['Drug History', patient.drugHistory || 'N/A'],
+      ['Past Surgical History', patient.pastSurgicalHistory || 'N/A'],
       ['Follow Up Date', patient.followUpDate || 'N/A']
     ],
     theme: 'striped',

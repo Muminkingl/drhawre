@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Use environment variables if available, otherwise fall back to hardcoded values
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://guuhuookghgjwfljsolq.supabase.co';
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd1dWh1b29rZ2hnandmbGpzb2xxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0NDI5NjksImV4cCI6MjA2OTAxODk2OX0.yd1XGuSydXY7rAZPvHMVLPPG0zD-rPJgqLmrmKGvZFM';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://hvcwikfcpyuplohlsoua.supabase.co';
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2Y3dpa2ZjcHl1cGxvaGxzb3VhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MzQwOTMsImV4cCI6MjA5NDQxMDA5M30.y4-PeYPwr5OvhWQZd-jGnh3_y3IinZiQtYNdltFshBE';
 
 export const supabase = createClient(supabaseUrl, supabaseKey, {
   auth: {

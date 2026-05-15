@@ -15,12 +15,11 @@ export const exportToExcel = (patients: Patient[], fileName: string = 'patients-
       'Treatment': patient.treatment,
       'Current Treatment': patient.currentTreatment,
       'Clinic ID': patient.clinicId,
-      'Response': patient.response,
+      'History': patient.history,
+      'Past Medical History': patient.pastMedicalHistory,
+      'Drug History': patient.drugHistory,
+      'Past Surgical History': patient.pastSurgicalHistory,
       'Note': patient.note,
-      'Image URL': patient.imageUrl,
-      'Imaging': patient.imaging,
-      'Ultrasound': patient.ultrasound,
-      'Lab Test': patient.labText,
       'Follow Up Date': patient.followUpDate,
       'Created At': new Date(patient.createdAt).toLocaleDateString()
     }))
@@ -38,12 +37,11 @@ export const exportToExcel = (patients: Patient[], fileName: string = 'patients-
     { wch: 25 }, // Treatment
     { wch: 25 }, // Current Treatment
     { wch: 12 }, // Clinic ID
-    { wch: 15 }, // Response
+    { wch: 30 }, // History
+    { wch: 30 }, // Past Medical History
+    { wch: 30 }, // Drug History
+    { wch: 30 }, // Past Surgical History
     { wch: 30 }, // Note
-    { wch: 40 }, // Image URL
-    { wch: 25 }, // Imaging
-    { wch: 25 }, // Ultrasound
-    { wch: 20 }, // Lab Test
     { wch: 15 }, // Follow Up Date
     { wch: 12 }  // Created At
   ];

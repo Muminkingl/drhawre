@@ -108,10 +108,13 @@ export default function ReportsPage() {
                 treatment: p.treatment,
                 currentTreatment: p.current_treatment || '',
                 clinicId: p.clinic_id || '',
-                response: p.response,
                 note: p.note,
                 tableData: p.table_data || '',
-                imageUrl: p.image_url || '',
+                history: p.history || '',
+                pastMedicalHistory: p.past_medical_history || '',
+                drugHistory: p.drug_history || '',
+                pastSurgicalHistory: p.past_surgical_history || '',
+                followUpDate: p.follow_up_date || '',
                 createdAt: p.created_at,
                 userId: p.user_id
               };

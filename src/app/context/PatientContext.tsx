@@ -17,14 +17,12 @@ export interface Patient {
   treatment: string;
   currentTreatment: string;
   clinicId: string;
-  response: string;
   note: string;
   tableData?: string;
-  imageUrl?: string;
-  imaging?: string;
-  ultrasound?: string;
-  labText?: string;
-  report?: string;
+  history?: string;
+  pastMedicalHistory?: string;
+  drugHistory?: string;
+  pastSurgicalHistory?: string;
   followUpDate?: string;
   createdAt: string;
   userId?: string;
@@ -43,14 +41,12 @@ interface PatientRecord {
   treatment: string;
   current_treatment: string;
   clinic_id: string;
-  response: string;
   note: string;
   table_data?: string;
-  image_url?: string;
-  imaging?: string;
-  ultrasound?: string;
-  lab_text?: string;
-  report?: string;
+  history?: string;
+  past_medical_history?: string;
+  drug_history?: string;
+  past_surgical_history?: string;
   follow_up_date?: string;
   created_at: string;
   user_id: string;
@@ -140,14 +136,12 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
           treatment: p.treatment,
           currentTreatment: p.current_treatment || '',
           clinicId: p.clinic_id || '',
-          response: p.response,
           note: p.note,
           tableData: p.table_data || '',
-          imageUrl: p.image_url || '',
-          imaging: p.imaging || '',
-          ultrasound: p.ultrasound || '',
-          labText: p.lab_text || '',
-          report: p.report || '',
+          history: p.history || '',
+          pastMedicalHistory: p.past_medical_history || '',
+          drugHistory: p.drug_history || '',
+          pastSurgicalHistory: p.past_surgical_history || '',
           followUpDate: p.follow_up_date || '',
           createdAt: p.created_at,
           userId: p.user_id
@@ -188,13 +182,12 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
         diagnosis: '',
         treatment: '',
         currentTreatment: '',
-        response: '',
-        imageUrl: '',
         note: '',
         tableData: '',
-        imaging: '',
-        ultrasound: '',
-        labText: '',
+        history: '',
+        pastMedicalHistory: '',
+        drugHistory: '',
+        pastSurgicalHistory: '',
         followUpDate: '',
       } : patientData;
 
@@ -243,14 +236,12 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
           treatment: sanitizedData.treatment || '',
           current_treatment: sanitizedData.currentTreatment || '',
           clinic_id: clinicId,
-          response: sanitizedData.response || '',
           note: sanitizedData.note || '',
           table_data: sanitizedData.tableData || '',
-          image_url: sanitizedData.imageUrl || '',
-          imaging: sanitizedData.imaging || '',
-          ultrasound: sanitizedData.ultrasound || '',
-          lab_text: sanitizedData.labText || '',
-          report: sanitizedData.report || '',
+          history: sanitizedData.history || '',
+          past_medical_history: sanitizedData.pastMedicalHistory || '',
+          drug_history: sanitizedData.drugHistory || '',
+          past_surgical_history: sanitizedData.pastSurgicalHistory || '',
           follow_up_date: sanitizedData.followUpDate || '',
           user_id: userId
         })
@@ -275,14 +266,12 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
           treatment: data[0].treatment,
           currentTreatment: data[0].current_treatment || '',
           clinicId: data[0].clinic_id || '',
-          response: data[0].response,
           note: data[0].note,
           tableData: data[0].table_data || '',
-          imageUrl: data[0].image_url || '',
-          imaging: data[0].imaging || '',
-          ultrasound: data[0].ultrasound || '',
-          labText: data[0].lab_text || '',
-          report: data[0].report || '',
+          history: data[0].history || '',
+          pastMedicalHistory: data[0].past_medical_history || '',
+          drugHistory: data[0].drug_history || '',
+          pastSurgicalHistory: data[0].past_surgical_history || '',
           followUpDate: data[0].follow_up_date || '',
           createdAt: data[0].created_at,
           userId: data[0].user_id
@@ -349,14 +338,12 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
       if (patientData.treatment !== undefined) dbData.treatment = patientData.treatment;
       if (patientData.currentTreatment !== undefined) dbData.current_treatment = patientData.currentTreatment;
       // Note: we don't allow editing clinicId as it's system-generated
-      if (patientData.response !== undefined) dbData.response = patientData.response;
       if (patientData.note !== undefined) dbData.note = patientData.note;
       if (patientData.tableData !== undefined) dbData.table_data = patientData.tableData;
-      if (patientData.imageUrl !== undefined) dbData.image_url = patientData.imageUrl;
-      if (patientData.imaging !== undefined) dbData.imaging = patientData.imaging;
-      if (patientData.ultrasound !== undefined) dbData.ultrasound = patientData.ultrasound;
-      if (patientData.labText !== undefined) dbData.lab_text = patientData.labText;
-      if (patientData.report !== undefined) dbData.report = patientData.report;
+      if (patientData.history !== undefined) dbData.history = patientData.history;
+      if (patientData.pastMedicalHistory !== undefined) dbData.past_medical_history = patientData.pastMedicalHistory;
+      if (patientData.drugHistory !== undefined) dbData.drug_history = patientData.drugHistory;
+      if (patientData.pastSurgicalHistory !== undefined) dbData.past_surgical_history = patientData.pastSurgicalHistory;
       if (patientData.followUpDate !== undefined) dbData.follow_up_date = patientData.followUpDate;
 
       // Always use Supabase for data storage

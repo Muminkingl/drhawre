@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 // Supabase configuration
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://guuhuookghgjwfljsolq.supabase.co';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://hvcwikfcpyuplohlsoua.supabase.co';
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY; // This needs to be the service_role key, not the anon key
 
 if (!supabaseKey) {

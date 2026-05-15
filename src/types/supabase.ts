@@ -21,15 +21,13 @@ export interface Database {
           diagnosis: string
           treatment: string
           current_treatment: string
-          response: string
+          history: string
+          past_medical_history: string
+          drug_history: string
+          past_surgical_history: string
           note: string | null
           follow_up_date: string
           table_data: string
-          image_url: string
-          imaging: string
-          ultrasound: string
-          lab_text: string
-          report: string
           created_at: string
           updated_at: string
           user_id: string
@@ -45,15 +43,13 @@ export interface Database {
           diagnosis: string
           treatment: string
           current_treatment: string
-          response: string
+          history: string
+          past_medical_history: string
+          drug_history: string
+          past_surgical_history: string
           note?: string | null
           follow_up_date: string
           table_data: string
-          image_url: string
-          imaging: string
-          ultrasound: string
-          lab_text: string
-          report: string
           created_at?: string
           updated_at?: string
           user_id: string
@@ -69,15 +65,13 @@ export interface Database {
           diagnosis?: string
           treatment?: string
           current_treatment?: string
-          response?: string
+          history?: string
+          past_medical_history?: string
+          drug_history?: string
+          past_surgical_history?: string
           note?: string | null
           follow_up_date?: string
           table_data?: string
-          image_url?: string
-          imaging?: string
-          ultrasound?: string
-          lab_text?: string
-          report?: string
           created_at?: string
           updated_at?: string
           user_id?: string
