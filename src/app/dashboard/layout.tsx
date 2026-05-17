@@ -174,7 +174,7 @@ export default function DashboardLayout({
               </div>
               {(sidebarOpen || isMobile) && (
                 <div>
-                  <h1 className="font-bold text-xl text-gray-900 dark:text-white">Dr. Halo</h1>
+                  <h1 className="font-bold text-xl text-gray-900 dark:text-white">Dr. Hawre</h1>
                   <p className="text-xs text-gray-500 dark:text-gray-400">Patient Management</p>
                 </div>
               )}
