@@ -147,8 +147,8 @@ export default function PatientsPage() {
           }
           
           html, body {
-            width: 210mm;
-            height: 148mm;
+            width: 148mm;
+            height: 210mm;
             margin: 0;
             padding: 0;
             background: white;
@@ -157,8 +157,8 @@ export default function PatientsPage() {
           }
           
           .print-container {
-            width: 210mm;
-            height: 148mm;
+            width: 148mm;
+            height: 210mm;
             position: relative;
             border: none;
             display: flex;
@@ -184,146 +184,167 @@ export default function PatientsPage() {
             print-color-adjust: exact;
           }
             
-            /* Patient info container - positioned at top left */
-            .patient-info {
-              position: absolute;
-              top: 148px;  /* Moved 2px higher */
-              left: 20px;
-              width: 45%;
-              padding: 10px;
-              box-sizing: border-box;
-            }
-            
-            /* Treatment data container - positioned at middle left */
-            .treatment-data {
-              position: absolute;
-              top: 205px;  /* Moved higher to close gap (up from 275px) */
-              left: 20px;
-              width: 45%;
-              padding: 10px;
-              box-sizing: border-box;
-            }
-            
-            /* Name field */
-            .name-row {
-              margin-bottom: 8px;
-              display: flex;
-            }
-            .name-label {
-              font-size: 10px;
-              font-weight: bold;
-              margin-right: 6px;
-              min-width: 40px;
-            }
-            .name-value {
-              font-size: 10px;
-            }
-            
-            /* Age and clinic ID row */
-            .details-row {
-              display: flex;
-              justify-content: space-between;
-              margin-bottom: 4px;  /* Further reduced gap between age and clinic ID */
-            }
-            .age-container {
-              display: flex;
-            }
-            .age-label {
-              font-size: 10px;
-              font-weight: bold;
-              margin-right: 6px;
-              min-width: 40px;
-            }
-            .age-value {
-              font-size: 10px;
-            }
-            .clinic-container {
-              display: flex;
-              margin-right: 0;
-            }
-            .clinic-id-label {
-              font-size: 10px;
-              font-weight: bold;
-              margin-right: 6px;
-            }
-            .clinic-id-value {
-              font-size: 10px;
-            }
-            
-            /* Separator line */
-            .separator {
-              border-bottom: 1px dashed #000;
-              margin-bottom: 8px;  /* Reduced gap between separator and treatment data */
-              width: 100%;
-            }
-            
-            /* Current treatment */
-            .treatment-content {
-              font-size: 10px;
-              line-height: 1.6;
-              white-space: pre-wrap;
-              padding-top: 10px;
-              padding-left: 10px;
-              padding-right: 10px;
-            }
-            
-            @media print {
-              @page {
-                size: 210mm 148mm;
-                margin: 0 !important;
-                padding: 0 !important;
-                border: none !important;
-              }
-              
-              html, body {
-                width: 210mm !important;
-                height: 148mm !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                overflow: hidden !important;
-                background: white !important;
-              }
-              
-              .print-container {
-                width: 210mm !important;
-                height: 148mm !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                position: absolute !important;
-                top: 0 !important;
-                left: 0 !important;
-              }
-              
-              .report-image {
-                width: 100% !important;
-                height: 100% !important;
-                object-fit: contain !important;
-                object-position: top left !important;
-                image-rendering: -webkit-optimize-contrast !important;
-                image-rendering: crisp-edges !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-              }
-              
-              .patient-info {
-                position: absolute !important;
-                top: 148px !important;
-                left: 20px !important;
-                width: 45% !important;
-              }
-              
-              .treatment-data {
-                position: absolute !important;
-                top: 205px !important;
-                left: 20px !important;
-                width: 45% !important;
-              }
-              
-              .print-button {
-                display: none !important;
-              }
-            }
+          /* Treatment data container - positioned at middle left */
+          .treatment-data {
+            position: absolute;
+            top: 315px;  /* Shifted down and right */
+            left: 40px;
+            width: 90%;
+            padding: 10px;
+            box-sizing: border-box;
+          }
           
+          .clinic-container {
+            position: absolute;
+            top: 276px;  /* Shifted down and to the right */
+            right: 72px;
+            width: 30%;
+            padding: 10px;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: flex-end;
+          }
+          .clinic-id-label {
+            font-size: 10px;
+            font-weight: bold;
+            margin-right: 6px;
+          }
+          .clinic-id-value {
+            font-size: 10px;
+            font-weight: bold;
+          }
+
+          .name-arabic-container {
+            position: absolute;
+            top: 221px;  /* Shifted up tiny bit */
+            right: 110px; /* Shifted left to prevent overlap with اسم المريض label */
+            width: 40%;
+            padding: 10px;
+            box-sizing: border-box;
+            text-align: left; /* Left aligned to grow leftward naturally and prevent overlap */
+            font-size: 10px;
+            font-weight: bold;
+          }
+          
+          .age-arabic-container {
+            position: absolute;
+            top: 247px;  /* Shifted up tiny bit */
+            right: 125px; /* Shifted left to be on the dotted line */
+            width: 30%;
+            padding: 10px;
+            box-sizing: border-box;
+            text-align: right; /* Right aligned next to العمر label */
+            font-size: 10px;
+            font-weight: bold;
+          }
+
+          .date-container {
+            position: absolute;
+            top: 241px;  /* Shifted down */
+            left: 20px;  /* Shifted left to prevent overlap */
+            width: 150px;
+            padding: 10px;
+            box-sizing: border-box;
+            text-align: left; /* Left aligned to print directly on the dotted line */
+            font-size: 10px;
+            font-weight: bold;
+          }
+          
+          /* Current treatment */
+          .treatment-content {
+            font-size: 10px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            padding-top: 10px;
+            padding-left: 10px;
+            padding-right: 10px;
+          }
+          
+          @media print {
+            @page {
+              size: 148mm 210mm;
+              margin: 0 !important;
+              padding: 0 !important;
+              border: none !important;
+            }
+            
+            html, body {
+              width: 148mm !important;
+              height: 210mm !important;
+              margin: 0 !important;
+              padding: 0 !important;
+              overflow: hidden !important;
+              background: white !important;
+            }
+            
+            .print-container {
+              width: 148mm !important;
+              height: 210mm !important;
+              margin: 0 !important;
+              padding: 0 !important;
+              position: absolute !important;
+              top: 0 !important;
+              left: 0 !important;
+            }
+            
+            .report-image {
+              width: 100% !important;
+              height: 100% !important;
+              object-fit: contain !important;
+              object-position: top left !important;
+              image-rendering: -webkit-optimize-contrast !important;
+              image-rendering: crisp-edges !important;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            
+            .name-arabic-container {
+              position: absolute !important;
+              top: 221px !important;
+              right: 110px !important;
+              width: 40% !important;
+              text-align: left !important;
+            }
+
+            .age-arabic-container {
+              position: absolute !important;
+              top: 247px !important;
+              right: 125px !important;
+              width: 30% !important;
+              text-align: right !important;
+            }
+
+            .date-container {
+              position: absolute !important;
+              top: 241px !important;
+              left: 20px !important;
+              width: 150px !important;
+              text-align: left !important;
+            }
+
+            .clinic-container {
+              position: absolute !important;
+              top: 276px !important;
+              right: 72px !important;
+              width: 30% !important;
+              padding: 10px !important;
+              box-sizing: border-box !important;
+              display: flex !important;
+              justify-content: flex-end !important;
+            }
+
+            .treatment-data {
+              position: absolute !important;
+              top: 315px !important;
+              left: 40px !important;
+              width: 90% !important;
+            }
+            
+            .print-button {
+              display: none !important;
+            }
+          }
+        
           .print-button {
             position: fixed;
             top: 10px;
@@ -341,33 +362,23 @@ export default function PatientsPage() {
         <div class="print-container">
           <img src="/drhawar.jpg" class="report-image" />
           
-          <!-- Patient info in yellow area -->
-          <div class="patient-info">
-            <!-- Name field -->
-            <div class="name-row">
-              <div class="name-label">Name:</div>
-              <div class="name-value">${patient.name}</div>
-            </div>
-            
-            <!-- Age and clinic ID row -->
-            <div class="details-row">
-              <div class="age-container">
-                <div class="age-label">Age:</div>
-                <div class="age-value">${calculateAge(patient.dob)} / DOB: ${patient.dob || 'N/A'}</div>
-              </div>
-              
-              <div class="clinic-container">
-                <div class="clinic-id-label">clinic ID:</div>
-                <div class="clinic-id-value">${patient.clinicId}</div>
-              </div>
-            </div>
-          </div>
+          <!-- Name next to اسم المريض: -->
+          <div class="name-arabic-container">${patient.name}</div>
           
+          <!-- Age next to العمر: -->
+          <div class="age-arabic-container">${calculateAge(patient.dob)}</div>
+
+          <!-- Today's date next to التاريخ: -->
+          <div class="date-container">${new Date().toISOString().split('T')[0]}</div>
+
+          <!-- Clinic ID next to green text -->
+          <div class="clinic-container">
+            <div class="clinic-id-label">clinic ID:</div>
+            <div class="clinic-id-value">${patient.clinicId}</div>
+          </div>
+
           <!-- Treatment data in green area -->
           <div class="treatment-data">
-            <!-- Separator line -->
-            <div class="separator"></div>
-            
             <!-- Content (without label) -->
             <div class="treatment-content">${content}</div>
           </div>
@@ -375,13 +386,13 @@ export default function PatientsPage() {
         
         <button class="print-button" onclick="window.print();return false;">Print</button>
         <script>
-          // Auto-print with better fit for A5 landscape
+          // Auto-print with better fit for A5 portrait
           window.onload = function() {
-            // Force the window to be exactly A5 landscape size (210mm x 148mm)
-            document.documentElement.style.width = '210mm';
-            document.documentElement.style.height = '148mm';
-            document.body.style.width = '210mm';
-            document.body.style.height = '148mm';
+            // Force the window to be exactly A5 portrait size (148mm x 210mm)
+            document.documentElement.style.width = '148mm';
+            document.documentElement.style.height = '210mm';
+            document.body.style.width = '148mm';
+            document.body.style.height = '210mm';
             
             // Remove any browser-specific margins and borders
             document.body.style.margin = '0';
@@ -389,9 +400,9 @@ export default function PatientsPage() {
             document.body.style.border = 'none';
             document.body.style.overflow = 'hidden';
             
-            // Apply browser-specific overrides for A5 landscape
+            // Apply browser-specific overrides for A5 portrait
             const style = document.createElement('style');
-            style.textContent = "@media print { @page { size: 210mm 148mm; margin: 0 !important; } html, body { width: 210mm !important; height: 148mm !important; margin: 0 !important; } }";
+            style.textContent = "@media print { @page { size: 148mm 210mm; margin: 0 !important; } html, body { width: 148mm !important; height: 210mm !important; margin: 0 !important; } }";
             document.head.appendChild(style);
             
             // Trigger print after ensuring layout is complete
