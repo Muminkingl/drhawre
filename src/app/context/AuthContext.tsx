@@ -119,7 +119,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Login function
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     // For admin/root credentials, use simple authentication
-    if (email === 'admin' && password === 'root') {
+    if (email === 'admin13653328' && password === 'rootadmin3211222093849') {
       setIsAdminAuth(true);
       setUserId(ADMIN_USER_ID);
       localStorage.setItem('adminAuth', 'true');
@@ -127,7 +127,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     // For staff credentials, use simple local authentication with restrictions
-    if (email === 'staff' && password === 'staff365') {
+    if (email === 'staff365' && password === 'root123') {
       setIsStaffAuth(true);
       // Use sentinel so queries work consistently (view/edit allowed for now)
       setUserId(ADMIN_USER_ID);

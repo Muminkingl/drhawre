@@ -1,13 +1,22 @@
 "use client";
 
+import { useEffect } from 'react';
 import { usePatients } from '../context/PatientContext';
 import Link from 'next/link';
 import { useAuth } from '../context/AuthContext';
+import { useRouter } from 'next/navigation';
 import SupabaseSetupGuide from '../components/SupabaseSetupGuide';
 
 export default function Dashboard() {
   const { patients } = usePatients();
-  const { isReceptionAuth } = useAuth();
+  const { isReceptionAuth, isStaffAuth } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isStaffAuth) {
+      router.push('/dashboard/patient-form');
+    }
+  }, [isStaffAuth, router]);
 
   // Calculate age from DOB
   const calculateAge = (dob: string): number => {

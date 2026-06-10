@@ -224,6 +224,9 @@ export default function DashboardLayout({
           <nav className="flex-1 px-4 py-6 overflow-y-auto overflow-x-hidden scrollbar-hide">
             <ul className="space-y-2">
               {navigationItems.filter(item => {
+                if (isStaffAuth) {
+                  return item.name === 'Patient Registration';
+                }
                 if (isReceptionAuth) {
                   return item.name === 'Dashboard' || item.name === 'Patient Registration';
                 }

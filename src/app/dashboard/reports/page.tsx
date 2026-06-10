@@ -41,8 +41,10 @@ export default function ReportsPage() {
   useEffect(() => {
     if (isReceptionAuth) {
       router.push('/dashboard');
+    } else if (isStaffAuth) {
+      router.push('/dashboard/patient-form');
     }
-  }, [isReceptionAuth, router]);
+  }, [isReceptionAuth, isStaffAuth, router]);
 
   const [visitCountToday, setVisitCountToday] = useState<number>(0);
   const [visitPatientsToday, setVisitPatientsToday] = useState<string[]>([]);

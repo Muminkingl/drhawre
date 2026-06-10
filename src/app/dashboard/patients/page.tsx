@@ -19,8 +19,10 @@ export default function PatientsPage() {
   useEffect(() => {
     if (isReceptionAuth) {
       router.push('/dashboard');
+    } else if (isStaffAuth) {
+      router.push('/dashboard/patient-form');
     }
-  }, [isReceptionAuth, router]);
+  }, [isReceptionAuth, isStaffAuth, router]);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
