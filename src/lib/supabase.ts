@@ -113,3 +113,47 @@ export async function ensureVisitsTableExists() {
     return false;
   }
 }
+
+// Function to ensure the appointments table exists
+export async function ensureAppointmentsTableExists() {
+  try {
+    const { error: checkError } = await supabase
+      .from('appointments')
+      .select('id')
+      .limit(1);
+
+    if (checkError) {
+      console.log('Appointments table may not exist, attempting to create it...');
+
+      const { error: createError } = await supabase.rpc('exec_sql', {
+        sql: `
+          CREATE TABLE IF NOT EXISTS public.appointments (
+            id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+            patient_name text NOT NULL,
+            phone_number text NOT NULL,
+            appointment_date text NOT NULL,
+            appointment_time text NOT NULL,
+            notes text DEFAULT '',
+            status text NOT NULL DEFAULT 'Scheduled',
+            created_at timestamp with time zone DEFAULT now(),
+            user_id uuid DEFAULT '00000000-0000-0000-0000-000000000000'::uuid
+          );
+          CREATE INDEX IF NOT EXISTS appointments_user_id_idx ON public.appointments (user_id);
+          CREATE INDEX IF NOT EXISTS appointments_date_idx ON public.appointments (appointment_date);
+        `
+      });
+
+      if (createError) {
+        console.error('Failed to create appointments table automatically:', createError);
+        return false;
+      }
+
+      console.log('Appointments table created successfully');
+      return true;
+    }
+    return true;
+  } catch (error) {
+    console.error('Error checking/creating appointments table:', error);
+    return false;
+  }
+}

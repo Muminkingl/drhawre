@@ -1,13 +1,14 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { usePatients, Patient } from '../../context/PatientContext';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 
-export default function PatientForm() {
-  const { addPatient, addVisit, patients, isLoading, error } = usePatients();
+function PatientFormContent() {
+  const { addPatient, addVisit, editAppointment, patients, isLoading, error } = usePatients();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { isStaffAuth, isReceptionAuth } = useAuth();
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
@@ -16,6 +17,8 @@ export default function PatientForm() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Patient[]>([]);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+
+  const [appointmentId, setAppointmentId] = useState<string | null>(null);
 
   // Role flags
   const isStaff = Boolean(isStaffAuth);
@@ -41,6 +44,26 @@ export default function PatientForm() {
     followUpDate: '',
     // clinicId is not included here as it's auto-generated
   });
+
+  // Pre-fill from query parameters (appointments workflow)
+  useEffect(() => {
+    const name = searchParams.get('name');
+    const phone = searchParams.get('phone');
+    const notes = searchParams.get('notes');
+    const apptId = searchParams.get('appointmentId');
+
+    if (apptId) {
+      setAppointmentId(apptId);
+    }
+    if (name || phone || notes) {
+      setFormData(prev => ({
+        ...prev,
+        name: name || prev.name,
+        mobileNumber: phone || prev.mobileNumber,
+        note: notes || prev.note,
+      }));
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (searchQuery.trim() === '') {
@@ -159,6 +182,15 @@ export default function PatientForm() {
       } else {
         // Since clinicId is auto-generated on the server, we don't include it in the form data
         await addPatient({ ...formData, clinicId: '' });
+      }
+
+      // If registered from an appointment, update appointment status to Completed
+      if (appointmentId) {
+        try {
+          await editAppointment(appointmentId, { status: 'Completed' });
+        } catch (apptErr) {
+          console.error('Failed to complete appointment:', apptErr);
+        }
       }
 
       // Reset form after submission
@@ -1073,5 +1105,17 @@ export default function PatientForm() {
       </div>
 
     </div>
+  );
+}
+
+export default function PatientForm() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-indigo-600"></div>
+      </div>
+    }>
+      <PatientFormContent />
+    </Suspense>
   );
 }

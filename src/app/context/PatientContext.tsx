@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { supabase, ensurePatientsTableExists, ensureVisitsTableExists } from '@/lib/supabase';
+import { supabase, ensurePatientsTableExists, ensureVisitsTableExists, ensureAppointmentsTableExists } from '@/lib/supabase';
 import { useAuth } from './AuthContext';
 
 // Define the Patient interface
@@ -51,6 +51,31 @@ export interface Visit {
   investigations?: Array<{ id: string; imageUrl: string; fileName: string; uploadedAt: string }>;
 }
 
+// Define the Appointment interface
+export interface Appointment {
+  id: string;
+  patientName: string;
+  phoneNumber: string;
+  appointmentDate: string; // YYYY-MM-DD
+  appointmentTime: string; // HH:MM
+  notes: string;
+  status: 'Scheduled' | 'Arrived' | 'Completed' | 'Cancelled';
+  createdAt: string;
+  userId?: string;
+}
+
+interface AppointmentRecord {
+  id: string;
+  patient_name: string;
+  phone_number: string;
+  appointment_date: string;
+  appointment_time: string;
+  notes: string;
+  status: 'Scheduled' | 'Arrived' | 'Completed' | 'Cancelled';
+  created_at: string;
+  user_id: string;
+}
+
 // Define the database record shape
 interface PatientRecord {
   id: string;
@@ -88,6 +113,12 @@ interface PatientContextType {
   addVisit: (patientId: string, visitData: Partial<Patient>) => Promise<void>;
   editVisit: (visitId: string, visitData: Partial<Visit>) => Promise<void>;
   getPatientVisits: (patientId: string) => Promise<Visit[]>;
+  appointments: Appointment[];
+  isLoadingAppointments: boolean;
+  addAppointment: (appointment: Omit<Appointment, 'id' | 'createdAt' | 'userId'>) => Promise<void>;
+  editAppointment: (id: string, appointmentData: Partial<Omit<Appointment, 'id' | 'createdAt' | 'userId'>>) => Promise<void>;
+  deleteAppointment: (id: string) => Promise<void>;
+  refreshAppointments: () => Promise<void>;
 }
 
 const PatientContext = createContext<PatientContextType | undefined>(undefined);
@@ -99,6 +130,9 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
   const [tableChecked, setTableChecked] = useState(false);
   const { session, isAuthenticated, userId, isStaffAuth } = useAuth();
 
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [isLoadingAppointments, setIsLoadingAppointments] = useState(true);
+
   // Check if the patients table exists
   useEffect(() => {
     async function checkTable() {
@@ -108,6 +142,7 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
           setError('Database table not found. Please contact the administrator.');
         }
         await ensureVisitsTableExists();
+        await ensureAppointmentsTableExists();
         setTableChecked(true);
       } else {
         setTableChecked(true);
@@ -185,12 +220,199 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // Refresh patients when auth state changes
+  // Load appointments data
+  const fetchAppointments = async () => {
+    try {
+      setIsLoadingAppointments(true);
+      setError(null);
+
+      if (!isAuthenticated || !userId) {
+        setAppointments([]);
+        return;
+      }
+
+      let query = supabase
+        .from('appointments')
+        .select('*')
+        .order('appointment_date', { ascending: true })
+        .order('appointment_time', { ascending: true });
+
+      if (userId !== '00000000-0000-0000-0000-000000000000') {
+        query = query.eq('user_id', userId);
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        console.error('Supabase error fetching appointments:', error);
+        throw new Error(`Database error: ${error.message}`);
+      }
+
+      if (data) {
+        const formatted = data.map((a: AppointmentRecord) => ({
+          id: a.id,
+          patientName: a.patient_name,
+          phoneNumber: a.phone_number,
+          appointmentDate: a.appointment_date,
+          appointmentTime: a.appointment_time,
+          notes: a.notes || '',
+          status: a.status,
+          createdAt: a.created_at,
+          userId: a.user_id
+        }));
+        setAppointments(formatted);
+      }
+    } catch (err) {
+      console.error('Error fetching appointments:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load appointments');
+    } finally {
+      setIsLoadingAppointments(false);
+    }
+  };
+
+  // Add a new appointment
+  const addAppointment = async (appointmentData: Omit<Appointment, 'id' | 'createdAt' | 'userId'>) => {
+    try {
+      setIsLoadingAppointments(true);
+      setError(null);
+
+      if (!isAuthenticated || !userId) {
+        throw new Error('Not authenticated');
+      }
+
+      const { data, error } = await supabase
+        .from('appointments')
+        .insert({
+          patient_name: appointmentData.patientName,
+          phone_number: appointmentData.phoneNumber,
+          appointment_date: appointmentData.appointmentDate,
+          appointment_time: appointmentData.appointmentTime,
+          notes: appointmentData.notes || '',
+          status: appointmentData.status || 'Scheduled',
+          user_id: userId
+        })
+        .select();
+
+      if (error) {
+        console.error('Supabase error adding appointment:', error);
+        throw new Error(`Database error: ${error.message}`);
+      }
+
+      if (data && data[0]) {
+        const a = data[0];
+        const newAppt: Appointment = {
+          id: a.id,
+          patientName: a.patient_name,
+          phoneNumber: a.phone_number,
+          appointmentDate: a.appointment_date,
+          appointmentTime: a.appointment_time,
+          notes: a.notes || '',
+          status: a.status,
+          createdAt: a.created_at,
+          userId: a.user_id
+        };
+        setAppointments(prev => [...prev, newAppt].sort((x, y) => {
+          const dateDiff = x.appointmentDate.localeCompare(y.appointmentDate);
+          if (dateDiff !== 0) return dateDiff;
+          return x.appointmentTime.localeCompare(y.appointmentTime);
+        }));
+      }
+    } catch (err) {
+      console.error('Error adding appointment:', err);
+      setError('Failed to add appointment');
+      throw err;
+    } finally {
+      setIsLoadingAppointments(false);
+    }
+  };
+
+  // Edit an appointment
+  const editAppointment = async (id: string, appointmentData: Partial<Omit<Appointment, 'id' | 'createdAt' | 'userId'>>) => {
+    try {
+      setIsLoadingAppointments(true);
+      setError(null);
+
+      if (!isAuthenticated || !userId) {
+        throw new Error('Not authenticated');
+      }
+
+      const dbData: any = {};
+      if (appointmentData.patientName !== undefined) dbData.patient_name = appointmentData.patientName;
+      if (appointmentData.phoneNumber !== undefined) dbData.phone_number = appointmentData.phoneNumber;
+      if (appointmentData.appointmentDate !== undefined) dbData.appointment_date = appointmentData.appointmentDate;
+      if (appointmentData.appointmentTime !== undefined) dbData.appointment_time = appointmentData.appointmentTime;
+      if (appointmentData.notes !== undefined) dbData.notes = appointmentData.notes;
+      if (appointmentData.status !== undefined) dbData.status = appointmentData.status;
+
+      const { error } = await supabase
+        .from('appointments')
+        .update(dbData)
+        .eq('id', id);
+
+      if (error) {
+        console.error('Supabase error editing appointment:', error);
+        throw new Error(`Database error: ${error.message}`);
+      }
+
+      setAppointments(prev => prev.map(a => 
+        a.id === id ? { ...a, ...appointmentData } : a
+      ).sort((x, y) => {
+        const dateDiff = x.appointmentDate.localeCompare(y.appointmentDate);
+        if (dateDiff !== 0) return dateDiff;
+        return x.appointmentTime.localeCompare(y.appointmentTime);
+      }));
+    } catch (err) {
+      console.error('Error editing appointment:', err);
+      setError('Failed to edit appointment');
+      throw err;
+    } finally {
+      setIsLoadingAppointments(false);
+    }
+  };
+
+  // Delete an appointment
+  const deleteAppointment = async (id: string) => {
+    try {
+      setIsLoadingAppointments(true);
+      setError(null);
+
+      if (!isAuthenticated || !userId) {
+        throw new Error('Not authenticated');
+      }
+
+      const { error } = await supabase
+        .from('appointments')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.error('Supabase error deleting appointment:', error);
+        throw new Error(`Database error: ${error.message}`);
+      }
+
+      setAppointments(prev => prev.filter(a => a.id !== id));
+    } catch (err) {
+      console.error('Error deleting appointment:', err);
+      setError('Failed to delete appointment');
+      throw err;
+    } finally {
+      setIsLoadingAppointments(false);
+    }
+  };
+
+  // Refresh appointments data
+  const refreshAppointments = async () => {
+    await fetchAppointments();
+  };
+
+  // Refresh patients and appointments when auth state changes
   useEffect(() => {
     if (tableChecked && isAuthenticated && userId) {
       fetchPatients();
+      fetchAppointments();
     } else {
       setPatients([]);
+      setAppointments([]);
     }
   }, [isAuthenticated, userId, tableChecked]);
 
@@ -616,7 +838,13 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
       refreshPatients,
       addVisit,
       editVisit,
-      getPatientVisits
+      getPatientVisits,
+      appointments,
+      isLoadingAppointments,
+      addAppointment,
+      editAppointment,
+      deleteAppointment,
+      refreshAppointments
     }}>
       {children}
     </PatientContext.Provider>
