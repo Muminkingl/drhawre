@@ -35,10 +35,15 @@ export default function PatientsPage() {
   const [customMinAge, setCustomMinAge] = useState<string>('');
   const [customMaxAge, setCustomMaxAge] = useState<string>('');
   const [showCustomAgeInputs, setShowCustomAgeInputs] = useState(false);
-  // New filter state
   const [activeFilter, setActiveFilter] = useState<string>('all');
   const [patientVisits, setPatientVisits] = useState<Visit[]>([]);
   const [isLoadingVisits, setIsLoadingVisits] = useState(false);
+  const [dateFilter, setDateFilter] = useState<string>('today'); // today, yesterday, all, custom
+  const [customDateFilterValue, setCustomDateFilterValue] = useState<string>('');
+
+  useEffect(() => {
+    setCustomDateFilterValue(new Date().toISOString().split('T')[0]);
+  }, []);
 
   // Visit selector modals
   const [showPdfModal, setShowPdfModal] = useState(false);
@@ -99,6 +104,17 @@ export default function PatientsPage() {
       minute: '2-digit'
     };
     return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
+  // Convert ISO timestamp string to local YYYY-MM-DD format
+  const getLocalDateString = (isoString: string): string => {
+    if (!isoString) return '';
+    const date = new Date(isoString);
+    if (isNaN(date.getTime())) return '';
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   };
 
   // Calculate age from DOB
@@ -639,7 +655,29 @@ export default function PatientsPage() {
       }
     }
 
-    return matchesSearch && matchesAge;
+    // Date filter
+    let matchesDate = true;
+    const patientDateStr = getLocalDateString(patient.createdAt);
+    const todayStr = getLocalDateString(new Date().toISOString());
+    const getYesterdayDateString = () => {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const year = yesterday.getFullYear();
+      const month = String(yesterday.getMonth() + 1).padStart(2, '0');
+      const day = String(yesterday.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+    const yesterdayStr = getYesterdayDateString();
+
+    if (dateFilter === 'today') {
+      matchesDate = patientDateStr === todayStr;
+    } else if (dateFilter === 'yesterday') {
+      matchesDate = patientDateStr === yesterdayStr;
+    } else if (dateFilter === 'custom' && customDateFilterValue) {
+      matchesDate = patientDateStr === customDateFilterValue;
+    }
+
+    return matchesSearch && matchesAge && matchesDate;
   });
 
   // Handle patient selection for details view
@@ -804,7 +842,7 @@ export default function PatientsPage() {
 
         {/* Search and Filter Section */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-6">
-          <div className="flex flex-col md:flex-row md:items-center gap-4">
+          <div className="flex flex-col lg:flex-row lg:items-center gap-4">
             <div className="relative flex-grow">
               <input
                 type="text"
@@ -840,6 +878,33 @@ export default function PatientsPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
+            </div>
+
+            {/* Quick Date Filters */}
+            <div className="flex flex-wrap items-center gap-1.5 bg-gray-50 dark:bg-gray-700/50 p-1.5 rounded-xl border border-gray-200 dark:border-gray-700">
+              {['today', 'yesterday', 'all', 'custom'].map((opt) => (
+                <button
+                  key={opt}
+                  type="button"
+                  onClick={() => setDateFilter(opt)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    dateFilter === opt
+                      ? 'bg-indigo-600 text-white shadow-sm'
+                      : 'text-gray-600 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600'
+                  }`}
+                >
+                  {opt === 'today' ? "Today" : opt === 'yesterday' ? 'Yesterday' : opt === 'all' ? 'All' : 'Custom Date'}
+                </button>
+              ))}
+              
+              {dateFilter === 'custom' && (
+                <input
+                  type="date"
+                  value={customDateFilterValue}
+                  onChange={(e) => setCustomDateFilterValue(e.target.value)}
+                  className="px-2 py-1 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-xs font-semibold focus:ring-1 focus:ring-indigo-500"
+                />
+              )}
             </div>
 
             <div className="relative">
