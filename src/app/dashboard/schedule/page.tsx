@@ -28,7 +28,9 @@ export default function SchedulePage() {
     appointmentDate: new Date().toISOString().split('T')[0],
     appointmentTime: '10:00',
     notes: '',
-    status: 'Scheduled' as Appointment['status']
+    status: 'Scheduled' as Appointment['status'],
+    gender: '',
+    age: ''
   });
 
   const [formError, setFormError] = useState<string | null>(null);
@@ -52,7 +54,9 @@ export default function SchedulePage() {
       appointmentDate: new Date().toISOString().split('T')[0],
       appointmentTime: '10:00',
       notes: '',
-      status: 'Scheduled'
+      status: 'Scheduled',
+      gender: '',
+      age: ''
     });
     setFormError(null);
     setIsModalOpen(true);
@@ -67,7 +71,9 @@ export default function SchedulePage() {
       appointmentDate: appt.appointmentDate,
       appointmentTime: appt.appointmentTime,
       notes: appt.notes,
-      status: appt.status
+      status: appt.status,
+      gender: appt.gender || '',
+      age: appt.age || ''
     });
     setFormError(null);
     setIsModalOpen(true);
@@ -83,6 +89,10 @@ export default function SchedulePage() {
     }
     if (!formData.phoneNumber.trim()) {
       setFormError('Phone Number is required');
+      return;
+    }
+    if (!formData.gender) {
+      setFormError('Gender is required');
       return;
     }
     if (!formData.appointmentDate) {
@@ -120,15 +130,9 @@ export default function SchedulePage() {
 
   const handleRegisterPatient = async (appt: Appointment) => {
     try {
-      // 1. Mark status as "Arrived"
+      // 1. Mark status as "Arrived" - this automatically creates the patient record
       await editAppointment(appt.id, { status: 'Arrived' });
-      // 2. Redirect to patient form with prefilled query parameters
-      const params = new URLSearchParams();
-      params.set('name', appt.patientName);
-      params.set('phone', appt.phoneNumber);
-      params.set('notes', appt.notes);
-      params.set('appointmentId', appt.id);
-      router.push(`/dashboard/patient-form?${params.toString()}`);
+      alert(`Patient record for "${appt.patientName}" has been automatically created!`);
     } catch (err) {
       console.error('Failed to register arrived patient:', err);
     }
@@ -490,6 +494,34 @@ export default function SchedulePage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
+                  <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">Gender <span className="text-red-500">*</span></label>
+                  <select
+                    name="gender"
+                    value={formData.gender}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm"
+                  >
+                    <option value="">Select gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">Age</label>
+                  <input
+                    type="text"
+                    name="age"
+                    value={formData.age}
+                    onChange={handleInputChange}
+                    placeholder="E.g. 30"
+                    className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
                   <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">Appointment Date <span className="text-red-500">*</span></label>
                   <input
                     type="date"
@@ -633,6 +665,13 @@ function AppointmentTable({ list, onStatusChange, onRegister, onEdit, onDelete, 
                   <div className="ml-4">
                     <div className="text-sm font-bold text-gray-900 dark:text-white">{appt.patientName}</div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">📞 {appt.phoneNumber}</div>
+                    {(appt.gender || appt.age) && (
+                      <div className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold mt-0.5">
+                        {appt.gender ? `Gender: ${appt.gender}` : ''}
+                        {appt.gender && appt.age ? ' | ' : ''}
+                        {appt.age ? `Age: ${appt.age}` : ''}
+                      </div>
+                    )}
                   </div>
                 </div>
               </td>
@@ -668,9 +707,9 @@ function AppointmentTable({ list, onStatusChange, onRegister, onEdit, onDelete, 
                     <button
                       onClick={() => onRegister(appt)}
                       className="px-3.5 py-1.5 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 rounded-lg hover:bg-amber-100 hover:text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800/40 dark:hover:bg-amber-900/50 transition-colors shadow-sm"
-                      title="Arrived & Register"
+                      title="Mark Arrived"
                     >
-                      Arrived & Register
+                      Mark Arrived
                     </button>
                   )}
 

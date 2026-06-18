@@ -135,11 +135,15 @@ export async function ensureAppointmentsTableExists() {
             appointment_time text NOT NULL,
             notes text DEFAULT '',
             status text NOT NULL DEFAULT 'Scheduled',
+            gender text DEFAULT '',
+            age text DEFAULT '',
+            converted_patient_id uuid DEFAULT null,
             created_at timestamp with time zone DEFAULT now(),
             user_id uuid DEFAULT '00000000-0000-0000-0000-000000000000'::uuid
           );
           CREATE INDEX IF NOT EXISTS appointments_user_id_idx ON public.appointments (user_id);
           CREATE INDEX IF NOT EXISTS appointments_date_idx ON public.appointments (appointment_date);
+          NOTIFY pgrst, 'reload schema';
         `
       });
 
@@ -151,6 +155,21 @@ export async function ensureAppointmentsTableExists() {
       console.log('Appointments table created successfully');
       return true;
     }
+
+    // If the table already exists, make sure columns gender, age, and converted_patient_id exist
+    const { error: alterError } = await supabase.rpc('exec_sql', {
+      sql: `
+        ALTER TABLE public.appointments ADD COLUMN IF NOT EXISTS gender text DEFAULT '';
+        ALTER TABLE public.appointments ADD COLUMN IF NOT EXISTS age text DEFAULT '';
+        ALTER TABLE public.appointments ADD COLUMN IF NOT EXISTS converted_patient_id uuid DEFAULT null;
+        NOTIFY pgrst, 'reload schema';
+      `
+    });
+
+    if (alterError) {
+      console.warn('Could not verify/add missing columns to appointments table:', alterError);
+    }
+
     return true;
   } catch (error) {
     console.error('Error checking/creating appointments table:', error);

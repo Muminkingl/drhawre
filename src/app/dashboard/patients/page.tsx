@@ -104,8 +104,14 @@ export default function PatientsPage() {
   // Calculate age from DOB
   const calculateAge = (dob: string): number | string => {
     if (!dob) return 'N/A';
+    
+    // Check if dob is just an age number (some legacy data might be like this)
+    if (/^\d{1,3}$/.test(dob.trim())) {
+      return parseInt(dob.trim(), 10);
+    }
+
     const birthDate = new Date(dob);
-    if (isNaN(birthDate.getTime())) return 'N/A';
+    if (isNaN(birthDate.getTime())) return dob; // Return raw value as fallback instead of N/A
 
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
@@ -1129,6 +1135,16 @@ export default function PatientsPage() {
                     </div>
                     <div className="flex space-x-2">
                       <button
+                        onClick={() => setIsEditing(true)}
+                        className="p-2 text-indigo-600 hover:bg-indigo-100 rounded-md transition duration-150"
+                        title="Edit Patient"
+                      >
+                        <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </button>
+
+                      <button
                         onClick={() => setShowPdfModal(true)}
                         className="p-2 text-green-600 hover:bg-green-100 rounded-md transition duration-150"
                         title="Generate PDF Report"
@@ -1163,12 +1179,10 @@ export default function PatientsPage() {
                     <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
                       <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Personal Information</h3>
                       <div className="space-y-3">
-                        {selectedPatient.dob && (
-                          <div className="flex justify-between">
-                            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">DOB</span>
-                            <span className="text-sm text-gray-900 dark:text-gray-100">{selectedPatient.dob}</span>
-                          </div>
-                        )}
+                        <div className="flex justify-between">
+                          <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Age</span>
+                          <span className="text-sm text-gray-900 dark:text-gray-100">{calculateAge(selectedPatient.dob)}</span>
+                        </div>
                         {selectedPatient.sex && (
                           <div className="flex justify-between">
                             <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Sex</span>

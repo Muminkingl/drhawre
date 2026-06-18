@@ -60,6 +60,9 @@ export interface Appointment {
   appointmentTime: string; // HH:MM
   notes: string;
   status: 'Scheduled' | 'Arrived' | 'Completed' | 'Cancelled';
+  gender: string;
+  age: string;
+  convertedPatientId?: string | null;
   createdAt: string;
   userId?: string;
 }
@@ -72,6 +75,9 @@ interface AppointmentRecord {
   appointment_time: string;
   notes: string;
   status: 'Scheduled' | 'Arrived' | 'Completed' | 'Cancelled';
+  gender: string;
+  age: string;
+  converted_patient_id: string | null;
   created_at: string;
   user_id: string;
 }
@@ -257,6 +263,9 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
           appointmentTime: a.appointment_time,
           notes: a.notes || '',
           status: a.status,
+          gender: a.gender || '',
+          age: a.age || '',
+          convertedPatientId: a.converted_patient_id || null,
           createdAt: a.created_at,
           userId: a.user_id
         }));
@@ -289,6 +298,9 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
           appointment_time: appointmentData.appointmentTime,
           notes: appointmentData.notes || '',
           status: appointmentData.status || 'Scheduled',
+          gender: appointmentData.gender || '',
+          age: appointmentData.age || '',
+          converted_patient_id: null,
           user_id: userId
         })
         .select();
@@ -308,6 +320,9 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
           appointmentTime: a.appointment_time,
           notes: a.notes || '',
           status: a.status,
+          gender: a.gender || '',
+          age: a.age || '',
+          convertedPatientId: a.converted_patient_id || null,
           createdAt: a.created_at,
           userId: a.user_id
         };
@@ -343,6 +358,101 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
       if (appointmentData.appointmentTime !== undefined) dbData.appointment_time = appointmentData.appointmentTime;
       if (appointmentData.notes !== undefined) dbData.notes = appointmentData.notes;
       if (appointmentData.status !== undefined) dbData.status = appointmentData.status;
+      if (appointmentData.gender !== undefined) dbData.gender = appointmentData.gender;
+      if (appointmentData.age !== undefined) dbData.age = appointmentData.age;
+      if (appointmentData.convertedPatientId !== undefined) dbData.converted_patient_id = appointmentData.convertedPatientId;
+
+      // Handle automatic patient creation when status becomes "Arrived"
+      if (appointmentData.status === 'Arrived') {
+        const { data: apptData, error: fetchError } = await supabase
+          .from('appointments')
+          .select('*')
+          .eq('id', id)
+          .single();
+
+        if (!fetchError && apptData) {
+          if (!apptData.converted_patient_id) {
+            const today = new Date();
+            const day = String(today.getDate()).padStart(2, '0');
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const year = String(today.getFullYear()).slice(-2);
+            const dateFormat = `${day}${month}${year}`;
+
+            const startOfDay = new Date(today);
+            startOfDay.setHours(0, 0, 0, 0);
+
+            const { data: todaysPatients, error: countError } = await supabase
+              .from('patients')
+              .select('id')
+              .gte('created_at', startOfDay.toISOString());
+
+            const patientCount = (todaysPatients?.length || 0) + 1;
+            const patientCountFormatted = String(patientCount).padStart(2, '0');
+            const clinicId = `${patientCountFormatted}${dateFormat}`;
+
+            const newPatientObj = {
+              name: apptData.patient_name,
+              dob: apptData.age || '', // Age maps to DOB/Age field
+              hospital_file_number: '',
+              mobile_number: apptData.phone_number || '',
+              sex: apptData.gender || '', // Gender maps to sex field
+              age_of_diagnosis: '',
+              diagnosis: '',
+              treatment: '',
+              current_treatment: '',
+              clinic_id: clinicId,
+              note: apptData.notes ? `[Appointment Notes: ${apptData.notes}]` : '',
+              table_data: '',
+              history: '',
+              past_medical_history: '',
+              drug_history: '',
+              past_surgical_history: '',
+              examination: '',
+              follow_up_date: '',
+              user_id: userId
+            };
+
+            const { data: createdPatient, error: insertError } = await supabase
+              .from('patients')
+              .insert(newPatientObj)
+              .select();
+
+            if (insertError) {
+              console.error('Failed to automatically create patient record:', insertError);
+            } else if (createdPatient && createdPatient[0]) {
+              const newPatientId = createdPatient[0].id;
+              
+              dbData.converted_patient_id = newPatientId;
+              appointmentData.convertedPatientId = newPatientId;
+
+              const visitsTableExists = await ensureVisitsTableExists();
+              if (visitsTableExists) {
+                const visitData = {
+                  patient_id: newPatientId,
+                  diagnosis: '',
+                  treatment: '',
+                  current_treatment: '',
+                  history: '',
+                  past_medical_history: '',
+                  drug_history: '',
+                  past_surgical_history: '',
+                  examination: '',
+                  follow_up_date: '',
+                  note: apptData.notes ? `[Appointment Notes: ${apptData.notes}]` : '',
+                  table_data: '',
+                  user_id: userId
+                };
+                await supabase.from('visits').insert(visitData);
+              }
+
+              await fetchPatients();
+            }
+          } else {
+            dbData.converted_patient_id = apptData.converted_patient_id;
+            appointmentData.convertedPatientId = apptData.converted_patient_id;
+          }
+        }
+      }
 
       const { error } = await supabase
         .from('appointments')
@@ -588,11 +698,9 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
         throw new Error('Not authenticated');
       }
 
-      // Disallow editing for staff role
+      // Allow editing for staff role per task requirements (e.g. to correct accidental mistakes)
       if (isStaffAuth) {
-        const msg = "You don’t have permission to edit patient data.";
-        setError(msg);
-        throw new Error(msg);
+        // Allow editing
       }
 
       // Convert camelCase to snake_case for database

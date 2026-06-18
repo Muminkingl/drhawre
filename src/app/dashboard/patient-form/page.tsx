@@ -389,11 +389,11 @@ function PatientFormContent() {
                     </select>
                   </div>
                 )}
-                {/* DOB */}
+                {/* Age */}
                 {mode === 'new' && (
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                      Date of Birth <span className="text-xs font-normal text-gray-400">(YYYY-MM-DD)</span>
+                      Age
                     </label>
                     <input
                       type="text"
@@ -402,7 +402,7 @@ function PatientFormContent() {
                       onChange={handleChange}
                       disabled={isLoading || formSubmitted}
                       className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-gray-50 dark:bg-gray-700/50 text-gray-900 dark:text-white disabled:opacity-70"
-                      placeholder="e.g. 1990-05-20"
+                      placeholder="e.g. 30"
                     />
                   </div>
                 )}
@@ -659,10 +659,10 @@ function PatientFormContent() {
                       </select>
                     </div>
 
-                    {/* DOB */}
+                    {/* Age */}
                     <div>
                       <label htmlFor="dob" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                        DOB <span className="text-xs text-gray-500 font-normal">(Date of Birth)</span>
+                        Age
                       </label>
                       <input
                         type="text"
@@ -670,7 +670,7 @@ function PatientFormContent() {
                         name="dob"
                         value={formData.dob}
                         onChange={handleChange}
-                        placeholder="YYYY-MM-DD"
+                        placeholder="e.g. 30"
                         disabled={isLoading || formSubmitted}
                         className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50 dark:bg-gray-700/50 text-gray-900 dark:text-white disabled:opacity-70 transition-all duration-200"
                       />

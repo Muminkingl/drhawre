@@ -175,15 +175,21 @@ export default function PatientEditForm({ patient, onSubmit, onCancel, isLoading
     // Calculate age for display
     let ageDisplay = 'N/A';
     if (patient.dob) {
-      const birthDate = new Date(patient.dob);
-      if (!isNaN(birthDate.getTime())) {
-        const today = new Date();
-        let age = today.getFullYear() - birthDate.getFullYear();
-        const monthDiff = today.getMonth() - birthDate.getMonth();
-        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-          age--;
+      if (/^\d{1,3}$/.test(patient.dob.trim())) {
+        ageDisplay = patient.dob.trim();
+      } else {
+        const birthDate = new Date(patient.dob);
+        if (!isNaN(birthDate.getTime())) {
+          const today = new Date();
+          let age = today.getFullYear() - birthDate.getFullYear();
+          const monthDiff = today.getMonth() - birthDate.getMonth();
+          if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+          }
+          ageDisplay = age.toString();
+        } else {
+          ageDisplay = patient.dob;
         }
-        ageDisplay = age.toString();
       }
     }
 
@@ -517,10 +523,10 @@ export default function PatientEditForm({ patient, onSubmit, onCancel, isLoading
           />
         </div>
 
-        {/* DOB */}
+        {/* Age */}
         <div>
           <label htmlFor="dob" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            DOB <span className="text-xs text-gray-500">(Date of Birth)</span>
+            Age
           </label>
           <input
             type="text"
@@ -528,7 +534,7 @@ export default function PatientEditForm({ patient, onSubmit, onCancel, isLoading
             name="dob"
             value={formData.dob}
             onChange={handleChange}
-            placeholder="YYYY-MM-DD or Age"
+            placeholder="E.g. 30"
             disabled={isLoading}
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white disabled:opacity-70 disabled:cursor-not-allowed"
           />

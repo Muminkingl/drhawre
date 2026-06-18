@@ -95,7 +95,7 @@ export const generatePatientPDF = async (patient: Patient) => {
     head: [['Field', 'Value']],
     body: [
       ['Name', patient.name || 'N/A'],
-      ['DOB', patient.dob || 'N/A'],
+      ['Age', patient.dob || 'N/A'],
       ['Sex', patient.sex || 'N/A'],
       ['Mobile Number', patient.mobileNumber || 'N/A'],
       ['Hospital File Number', patient.hospitalFileNumber || 'N/A']
