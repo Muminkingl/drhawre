@@ -656,7 +656,7 @@ export default function PatientsPage() {
       }
     }
 
-    // Date filter
+    // Date filter: check if patient was created on that date OR visited on that date
     let matchesDate = true;
     const patientDateStr = getLocalDateString(patient.createdAt);
     const todayStr = getLocalDateString(new Date().toISOString());
@@ -670,12 +670,20 @@ export default function PatientsPage() {
     };
     const yesterdayStr = getYesterdayDateString();
 
+    let targetDateStr = '';
     if (dateFilter === 'today') {
-      matchesDate = patientDateStr === todayStr;
+      targetDateStr = todayStr;
     } else if (dateFilter === 'yesterday') {
-      matchesDate = patientDateStr === yesterdayStr;
+      targetDateStr = yesterdayStr;
     } else if (dateFilter === 'custom' && customDateFilterValue) {
-      matchesDate = patientDateStr === customDateFilterValue;
+      targetDateStr = customDateFilterValue;
+    }
+
+    if (targetDateStr) {
+      const matchesCreatedDate = patientDateStr === targetDateStr;
+      const visits = patientVisitsMap[patient.id] || [];
+      const matchesVisitDate = visits.some(v => getLocalDateString(v.visited_at) === targetDateStr);
+      matchesDate = matchesCreatedDate || matchesVisitDate;
     }
 
     return matchesSearch && matchesAge && matchesDate;
