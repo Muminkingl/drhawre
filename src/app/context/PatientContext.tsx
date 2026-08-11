@@ -118,6 +118,7 @@ interface PatientContextType {
   refreshPatients: () => Promise<void>;
   addVisit: (patientId: string, visitData: Partial<Patient>) => Promise<void>;
   editVisit: (visitId: string, visitData: Partial<Visit>) => Promise<void>;
+  deleteVisit: (visitId: string) => Promise<void>;
   getPatientVisits: (patientId: string) => Promise<Visit[]>;
   appointments: Appointment[];
   isLoadingAppointments: boolean;
@@ -934,6 +935,34 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // Delete a visit record
+  const deleteVisit = async (visitId: string) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      if (!isAuthenticated || !userId) {
+        throw new Error('Not authenticated');
+      }
+
+      const { error } = await supabase
+        .from('visits')
+        .delete()
+        .eq('id', visitId);
+
+      if (error) {
+        console.error('Error deleting visit:', error);
+        throw new Error(`Failed to delete visit: ${error.message}`);
+      }
+    } catch (err) {
+      console.error('Exception in deleteVisit:', err);
+      setError(err instanceof Error ? err.message : 'Failed to delete visit');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <PatientContext.Provider value={{
       patients,
@@ -946,6 +975,7 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
       refreshPatients,
       addVisit,
       editVisit,
+      deleteVisit,
       getPatientVisits,
       appointments,
       isLoadingAppointments,

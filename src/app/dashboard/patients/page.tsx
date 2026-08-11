@@ -12,7 +12,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '../../context/AuthContext';
 
 export default function PatientsPage() {
-  const { patients, deletePatient, editPatient, isLoading, error, refreshPatients, getPatientVisits, editVisit } = usePatients();
+  const { patients, deletePatient, editPatient, isLoading, error, refreshPatients, getPatientVisits, editVisit, deleteVisit } = usePatients();
   const { isStaffAuth, isReceptionAuth, isAuthenticated } = useAuth();
   const router = useRouter();
   
@@ -40,6 +40,7 @@ export default function PatientsPage() {
   const [isLoadingVisits, setIsLoadingVisits] = useState(false);
   const [dateFilter, setDateFilter] = useState<string>('today'); // today, yesterday, all, custom
   const [customDateFilterValue, setCustomDateFilterValue] = useState<string>('');
+  const [isDeletingVisit, setIsDeletingVisit] = useState<string | null>(null);
 
   useEffect(() => {
     setCustomDateFilterValue(new Date().toISOString().split('T')[0]);
@@ -713,6 +714,33 @@ export default function PatientsPage() {
     }
   };
 
+  // Handle visit deletion
+  const handleDeleteVisit = async (visitId: string) => {
+    if (isStaffAuth) {
+      alert("You don't have permission to delete visit records.");
+      return;
+    }
+
+    if (window.confirm('Are you sure you want to delete this visit record? This action cannot be undone.')) {
+      try {
+        setIsDeletingVisit(visitId);
+        await deleteVisit(visitId);
+        setPatientVisits(prev => prev.filter(v => v.id !== visitId));
+        await fetchAllVisitSummaries();
+        try {
+          window.dispatchEvent(new CustomEvent('visitsUpdated'));
+        } catch (e) {
+          // Ignore event dispatch errors
+        }
+      } catch (err) {
+        console.error('Error deleting visit:', err);
+        alert('Failed to delete visit record. Please try again.');
+      } finally {
+        setIsDeletingVisit(null);
+      }
+    }
+  };
+
   // Handle patient edit form submission
   const handleEditSubmit = async (data: Partial<Patient>) => {
     if (!selectedPatient) return;
@@ -1296,6 +1324,9 @@ export default function PatientsPage() {
                           <details key={visit.id} className="group bg-gray-50 dark:bg-gray-700/30 rounded-lg border border-gray-100 dark:border-gray-600 overflow-hidden transition-all duration-200" open={index === 0}>
                             <summary className="flex justify-between items-center p-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 list-none">
                               <div className="flex items-center gap-3">
+                                <span className="text-xs font-bold px-2 py-0.5 bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 rounded border border-indigo-200 dark:border-indigo-800 shrink-0">
+                                  v{patientVisits.length - index}
+                                </span>
                                 <div className="flex flex-col">
                                   <span className="text-sm font-bold text-gray-900 dark:text-white">
                                     {formatDate(visit.visited_at)}
@@ -1333,6 +1364,24 @@ export default function PatientsPage() {
                                     className="text-[10px] px-2 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors"
                                   >
                                     Edit
+                                  </button>
+                                )}
+                                {!isStaffAuth && (
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleDeleteVisit(visit.id);
+                                    }}
+                                    disabled={isDeletingVisit === visit.id}
+                                    className="text-[10px] px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center gap-1"
+                                  >
+                                    {isDeletingVisit === visit.id ? (
+                                      <svg className="animate-spin h-3 w-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                      </svg>
+                                    ) : null}
+                                    Delete
                                   </button>
                                 )}
                                 <svg className="h-4 w-4 text-gray-400 group-open:rotate-180 transition-transform duration-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
